@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.forms import ModelForm
-
+from .thread_form import ThreadForm
 from board_app.models import Post
 from .models import Thread
-from .forms import ThreadForm
+from .forms import PostForm
 
 # PostFormクラスをビュー関数の前に定義
 class PostForm(ModelForm):
@@ -12,7 +12,7 @@ class PostForm(ModelForm):
     """
     class Meta:
         model = Post
-        fields = ('name', 'micropost','file')
+        fields = ('name','file')
 
 
 def create_post(request):
@@ -111,7 +111,23 @@ def thread_list(request):
 
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)
-    return render(request, 'board_app/thread_detail.html', {'thread': thread})
+    posts = thread.posts.all()  # スレッドに紐づくすべての投稿を取得
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.thread = thread  # この投稿がどのスレッドに属するかを設定
+            post.author = request.user  # 現在のユーザーを投稿者に設定（ログインしている場合）
+            post.save()
+            return redirect('board_app:thread_detail', thread_id=thread.id)
+    else:
+        form = PostForm()
+
+    return render(request, 'board_app/thread_detail.html', {
+        'thread': thread,
+        'posts': posts,
+        'form': form,
+    })
 
 def create_thread(request):
     if request.method == 'POST':

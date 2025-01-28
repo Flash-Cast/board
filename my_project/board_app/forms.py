@@ -1,7 +1,7 @@
 from django import forms
-from .models import Thread
+from .models import Post
 
-class ThreadForm(forms.ModelForm):
+class PostForm(forms.ModelForm):
     class Meta:
-        model = Thread
-        fields = ['title', 'content']
+        model = Post
+        fields = ['content', 'file', 'name']

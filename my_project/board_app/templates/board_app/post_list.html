@@ -18,7 +18,7 @@
       <tr>
         <th>{{ post.id }}</th>
         <td>{{ post.name }}</td>
-        <td>{{ post.micropost }}</td>
+        <td>{{ post.content }}</td>
         <td>
           <a href="{% url 'board_app:edit_post' post_id=post.id %}">修正</a>
           <a href="{% url 'board_app:delete_post' post_id=post.id %}">削除</a>

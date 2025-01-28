@@ -1,0 +1,34 @@
+<!-- thread_detail.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ thread.title }}</title>
+</head>
+<body>
+    <h1>{{ thread.title }}</h1>
+    <p>{{ thread.content }}</p>
+
+    <h2>投稿</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">リプライする</button>
+    </form>
+
+    <h2>リプライ一覧</h2>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <strong>{{ post.author.username }}</strong> ({{ post.created_at }})
+                <p>{{ post.content }}</p>
+            </li>
+        {% empty %}
+            <li>リプライはありません。</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'board_app:thread_list' %}">スレッド一覧に戻る</a>
+</body>
+</html>

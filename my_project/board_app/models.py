@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 class Thread(models.Model):
     title = models.CharField('スレッドタイトル', max_length=100)
@@ -10,10 +11,12 @@ class Thread(models.Model):
         return self.title
 
 class Post(models.Model):
-    name = models.CharField('user name', max_length=15, default="Unnamed")
-    micropost = models.CharField('tweet', max_length=140, blank=True)
-    file = models.FileField(upload_to='uploads/', null=True, blank=True)
-    thread = thread = models.ForeignKey('Thread', null=True, blank=True, related_name='posts', on_delete=models.CASCADE)
-  
+    thread = models.ForeignKey(Thread, related_name="posts", on_delete=models.CASCADE)
+    content = models.TextField(default="No content")
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    file = models.FileField(upload_to='uploads/', blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+
     def __str__(self):
-        return self.name
+        return f"Post by {self.author} on {self.created_at}"

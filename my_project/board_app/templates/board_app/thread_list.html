@@ -10,7 +10,7 @@
     <a href="{% url 'board_app:create_thread' %}">新しいスレッドを作成</a>
     <ul>
         {% for thread in threads %}
-            <li><a href="{% url 'thread_detail' thread.id %}">{{ thread.title }}</a> - 作成日: {{ thread.created_at }}</li>
+            <li><a href="{% url 'board_app:thread_detail' thread.id %}">{{ thread.title }}</a> - 作成日: {{ thread.created_at }}</li>
         {% empty %}
             <li>スレッドはありません。</li>
         {% endfor %}
