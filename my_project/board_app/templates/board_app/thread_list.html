@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スレッド一覧</title>
+</head>
+<body>
+    <h1>スレッド一覧</h1>
+    <a href="{% url 'board_app:create_thread' %}">新しいスレッドを作成</a>
+    <ul>
+        {% for thread in threads %}
+            <li><a href="{% url 'thread_detail' thread.id %}">{{ thread.title }}</a> - 作成日: {{ thread.created_at }}</li>
+        {% empty %}
+            <li>スレッドはありません。</li>
+        {% endfor %}
+    </ul>
+
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>スレッド作成</title>
+</head>
+<body>
+    <h1>新しいスレッドを作成</h1>
+    
+    <!-- フォーム表示 -->
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        {% if form.errors %}
+            <div style="color: red;">
+                <p>入力にエラーがあります。修正してください。</p>
+            </div>
+        {% endif %}
+        
+        <button type="submit">作成</button>
+    </form>
+
+    <a href="{% url 'board_app:thread_list' %}">スレッド一覧に戻る</a>
+
+
+</body>
+</html>

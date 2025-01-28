@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms import ModelForm
 
 from board_app.models import Post
-
+from .models import Thread
+from .forms import ThreadForm
 
 # PostFormクラスをビュー関数の前に定義
 class PostForm(ModelForm):
@@ -11,7 +12,7 @@ class PostForm(ModelForm):
     """
     class Meta:
         model = Post
-        fields = ('name', 'micropost')
+        fields = ('name', 'micropost','file')
 
 
 def create_post(request):
@@ -104,5 +105,20 @@ def delete_post(request, post_id):
     return redirect('board_app:read_post')
 
 
+def thread_list(request):
+    threads = Thread.objects.all()  # スレッドを全て取得
+    return render(request, 'board_app/thread_list.html', {'threads': threads})
 
+def thread_detail(request, thread_id):
+    thread = get_object_or_404(Thread, id=thread_id)
+    return render(request, 'board_app/thread_detail.html', {'thread': thread})
 
+def create_thread(request):
+    if request.method == 'POST':
+        form = ThreadForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('board_app:thread_list')  # 名前空間を含めたURLにリダイレクト
+    else:
+        form = ThreadForm()
+    return render(request, 'board_app/thread_form.html', {'form': form})

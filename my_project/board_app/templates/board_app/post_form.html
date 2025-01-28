@@ -9,12 +9,16 @@
     {% if post_id %}
     <form action="{% url 'board_app:edit_post' post_id=post_id %}" method="post">
     {% else %}
-    <form action="{% url 'board_app:create_post' %}" method="post">
+    <form action="{% url 'board_app:create_post' %}" method="post" enctype="multipart/form-data">
     {% endif %}
       {% csrf_token %}
       {{ form }}
       <button type="submit">送信</button>
     </form>
     <a href="{% url 'board_app:read_post' %}">戻る</a>
+
+    <a href="{% url 'board_app:create_thread' %}">新しいスレッドを作成</a>
+    <a href="{% url 'board_app:thread_list' %}">スレッド一覧に戻る</a>
+
 </body>
 </html>
