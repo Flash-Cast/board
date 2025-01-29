@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>プロフィール編集</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">更新</button>
+    </form>
+
+    <a href="{% url 'board_app:profile' %}">プロフィールページに戻る</a>
+{% endblock %}

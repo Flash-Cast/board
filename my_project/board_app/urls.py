@@ -1,6 +1,8 @@
 from django.urls import path
 from board_app import views
 from django.contrib.auth import views as auth_views
+from board_app.views import ban_user
+from .views import report_post
 # URL のロードを確認
 print("board_app URLs loaded")
 
@@ -17,4 +19,10 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
+    path('about/', views.about, name='about'),
+    path('ban_user/<int:user_id>/', ban_user, name='ban_user'),
+    path('report/<int:post_id>/', views.report_post, name='report_post'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
+    path('profile/', views.profile, name='profile'),  # プロフィールページ
+    path('profile/edit/', views.profile_edit, name='profile_edit'), 
 ]

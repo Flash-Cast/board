@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Site{% endblock %}</title>
+    <title>{% block title %}生体の住民{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
@@ -13,7 +13,11 @@
             <ul>
                 <li><a href="{% url 'board_app:thread_list' %}">スレッド一覧</a></li>
                 <li><a href="{% url 'board_app:create_thread' %}">スレッド作成</a></li>
-                
+                <li><a href="{% url 'board_app:about' %}">サイトについて</a></li>
+                {% if user.is_authenticated %}
+                    <!-- ログインしているユーザーにプロフィールリンクを表示 -->
+                    <li><a href="{% url 'board_app:profile' %}">プロフィール</a></li>
+                {% endif %}
                 <!-- ログアウトフォーム -->
                 <li>
                     <form method="POST" action="{% url 'logout' %}">
@@ -30,7 +34,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 My Site</p>
+        <p>&copy; 2025 tsukui</p>
     </footer>
 </body>
 </html>

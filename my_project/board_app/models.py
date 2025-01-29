@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.timezone import now
+
 
 class Thread(models.Model):
     title = models.CharField('スレッドタイトル', max_length=100)
     content = models.TextField(default="No content") 
     created_at = models.DateTimeField('作成日時', auto_now_add=True)
-
+    author = models.ForeignKey(User, on_delete=models.CASCADE,default=1)
     def __str__(self):
         return self.title
 
@@ -20,3 +20,9 @@ class Post(models.Model):
 
     def __str__(self):
         return f"Post by {self.author} on {self.created_at}"
+    
+class Report(models.Model):
+    reported_post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    reason = models.TextField(default="No content")
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -79,3 +79,23 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+form {
+    margin: 20px;
+}
+
+input, button {
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}

@@ -6,22 +6,30 @@
     <h1>{{ thread.title }}</h1>
     <p>{{ thread.content }}</p>
 
-    <h2>リプライする</h2>
+    <h2>コメント作成</h2>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">リプライする</button>
+        <button type="submit">コメントする</button>
     </form>
 
-    <h2>リプライ一覧</h2>
+    <h2>コメント一覧</h2>
     <ul>
         {% for post in posts %}
             <li>
                 <strong>{{ post.author.username }}</strong> ({{ post.created_at }})
                 <p>{{ post.content }}</p>
+
+                <!-- 通報フォーム: post.idが存在する場合に表示 -->
+                {% if post.id %}
+                    <form method="POST" action="{% url 'board_app:report_post' post.id %}">
+                        {% csrf_token %}
+                        <button type="submit">通報</button>
+                    </form>
+                {% endif %}
             </li>
         {% empty %}
-            <li>リプライはありません。</li>
+            <li>コメントはありません。</li>
         {% endfor %}
     </ul>
 

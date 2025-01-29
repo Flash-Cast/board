@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>プロフィール</h1>
+
+    <p><strong>ユーザー名:</strong> {{ user.username }}</p>
+    <p><strong>メール:</strong> {{ user.email }}</p>
+
+    <a href="{% url 'board_app:profile_edit' %}">プロフィールを編集</a>
+{% endblock %}
