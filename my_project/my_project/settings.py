@@ -120,6 +120,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # プロジェクト内の 'static' フォルダを指定
+]
+
 # メディアファイルのURL設定
 MEDIA_URL = '/media/'
 
