@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}投稿を通報{% endblock %}
+
+{% block content %}
+    <h1>投稿を通報</h1>
+    <p>問題のある投稿を管理者に報告できます。</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">送信</button>
+    </form>
+
+    <a href="{% url 'board_app:thread_detail' thread_id=thread.id %}">戻る</a>
+{% endblock %}

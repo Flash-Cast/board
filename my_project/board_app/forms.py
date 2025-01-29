@@ -12,7 +12,7 @@ class UserRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email','password']
+        fields = ['username', 'email','password1','password2']
 
     def clean_email(self):
         allowed_domains = ["ms.saitama-u.ac.jp"]  # 許可するドメイン
@@ -43,7 +43,8 @@ class ReportForm(forms.ModelForm):
 class ProfileEditForm(UserChangeForm):
     # 必要なフィールドだけを表示（例えば、ユーザー名、メール、パスワードなど）
     email = forms.EmailField(required=True)
+    password = None  # パスワードを表示しない
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email']

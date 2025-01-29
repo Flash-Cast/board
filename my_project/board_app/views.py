@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import ReportForm
 from .forms import ProfileEditForm
+from django.contrib.auth.decorators import user_passes_test
 
 # PostFormクラスをビュー関数の前に定義
 class PostForm(ModelForm):
@@ -20,51 +21,7 @@ class PostForm(ModelForm):
         model = Post
         fields = ('name', 'content', 'file')
 
-@login_required  # ログインしていない場合、ログインページにリダイレクト
-def create_post(request):
-    post = Post()
 
-    if request.method == 'GET':
-        form = PostForm(instance=post)
-        return render(request, 'board_app/post_form.html', {'form': form})
-
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user  # 現在のユーザーを設定
-            post.save()
-            messages.success(request, '投稿が作成されました！')
-            return redirect('board_app:thread_list')  # 適切なリダイレクト先に修正
-
-        else:
-            print(form.errors)
-            return render(request, 'board_app/post_form.html', {'form': form})
-
-def read_post(request):
-    posts = Post.objects.all().order_by('id')
-    return render(request, 'board_app/post_list.html', {'posts': posts})
-
-def edit_post(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-
-    if request.method == 'GET':
-        form = PostForm(instance=post)
-        return render(request, 'board_app/post_form.html', {'form': form, 'post_id': post_id})
-
-    elif request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.save()
-
-        return redirect('board_app:thread_detail', thread_id=post.thread.id)  # 編集後にスレッド詳細ページにリダイレクト
-
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    thread_id = post.thread.id
-    post.delete()
-    return redirect('board_app:thread_detail', thread_id=thread_id)  # 削除後にスレッド詳細ページにリダイレクト
 
 @login_required
 def thread_list(request):
@@ -129,6 +86,10 @@ def ban_user(request, user_id):
 @login_required
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
+    thread = post.thread if post.thread else None
+    if not thread:
+        messages.error(request, '関連するスレッドが見つかりません。')
+        return redirect('board_app:thread_list')  # スレッド一覧などにリダイレクト
     if request.method == 'POST':
         form = ReportForm(request.POST)
         if form.is_valid():
@@ -136,10 +97,10 @@ def report_post(request, post_id):
             report.reported_post = post
             report.reported_by = request.user
             report.save()
-            return redirect('board_app:thread_detail', thread_id=post.thread.id)
+            return redirect('board_app:thread_list')
     else:
         form = ReportForm()
-    return render(request, 'report_post.html', {'form': form})
+    return render(request, 'board_app/report_post.html', {'form': form})
 
 @login_required
 def profile_edit(request):
@@ -163,3 +124,11 @@ def profile_edit(request):
 @login_required
 def profile(request):
     return render(request, 'board_app/profile.html', {'user': request.user})
+
+def admin_required(user):
+    return user.is_authenticated and (user.is_superuser or user.groups.filter(name="管理者").exists())
+
+@login_required
+@user_passes_test(admin_required)
+def admin_dashboard(request):
+    return render(request, 'board_app/admin_dashboard.html')

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>管理者専用画面</h1>
+    <p>ここでは、管理者向けの機能を提供します。</p>
+
+    <ul>
+        <li><a href="{% url 'admin:index' %}">Django管理画面</a></li>
+        <li><a href="{% url 'board_app:thread_list' %}">掲示板一覧</a></li>
+    </ul>
+{% endblock %}
