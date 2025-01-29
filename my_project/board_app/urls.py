@@ -1,5 +1,6 @@
 from django.urls import path
 from board_app import views
+from django.contrib.auth import views as auth_views
 # URL のロードを確認
 print("board_app URLs loaded")
 
@@ -13,4 +14,7 @@ urlpatterns = [
     path('create/', views.create_thread, name='create_thread'),  # スレッド作成
     path('', views.thread_list, name='thread_list'),  # スレッド一覧（トップページ）
     path('thread/<int:thread_id>/', views.thread_detail, name='thread_detail'),  # スレッド詳細
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('register/', views.register, name='register'),
 ]

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <title>新規登録</title>
+    <h1>新規登録</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- フォームフィールドをパラグラフ形式で表示 -->
+
+        {% if form.errors %}
+            <div style="color: red;">
+                <p>入力にエラーがあります。修正してください。</p>
+            </div>
+        {% endif %}
+        
+        <button type="submit">登録</button>
+    </form>
+
+    <a href="{% url 'login' %}">ログインページへ戻る</a>
+{% endblock %}

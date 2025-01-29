@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.forms import ModelForm
-from .thread_form import ThreadForm
-from board_app.models import Post
-from .models import Thread
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from board_app.models import Post, Thread
 from .forms import PostForm
+from .thread_form import ThreadForm
+from .forms import UserRegistrationForm
 
 # PostFormクラスをビュー関数の前に定義
 class PostForm(ModelForm):
@@ -12,112 +14,69 @@ class PostForm(ModelForm):
     """
     class Meta:
         model = Post
-        fields = ('name','file')
+        fields = ('name', 'content', 'file')
 
-
+@login_required  # ログインしていない場合、ログインページにリダイレクト
 def create_post(request):
-    """
-    新たなデータを作成する
-    """
-    # オブジェクトを新規作成する
     post = Post()
 
-    # ページロード時
     if request.method == 'GET':
-        # 新規作成オブジェクトにより form を作成
         form = PostForm(instance=post)
+        return render(request, 'board_app/post_form.html', {'form': form})
 
-        # ページロード時は form を Template に渡す
-        return render(request,
-                      'board_app/post_form.html',  # 呼び出す Template
-                      {'form': form})  # Template に渡すデータ
-
-    # 実行ボタン押下時
     if request.method == 'POST':
-        # POST されたデータにより form を作成
         form = PostForm(request.POST, instance=post)
-
-        # 入力されたデータのバリデーション
         if form.is_valid():
-    # チェック結果に問題なければデータを作成する
             post = form.save(commit=False)
+            post.author = request.user  # 現在のユーザーを設定
             post.save()
-            return redirect('board_app:read_post')  # リダイレクト
+            messages.success(request, '投稿が作成されました！')
+            return redirect('board_app:thread_list')  # 適切なリダイレクト先に修正
+
         else:
-            # フォームが無効な場合、エラーをログに出力
-            print(form.errors)  # エラーメッセージを表示
-            # フォームのエラーをそのままテンプレートに渡す
-            return render(request,
-                        'board_app/post_form.html',  # 再度フォームページを表示
-                        {'form': form})  # エラーとフォームを再表示
-
-
+            print(form.errors)
+            return render(request, 'board_app/post_form.html', {'form': form})
 
 def read_post(request):
-    """
-    データの一覧を表示する
-    """
-    # 全オブジェクトを取得
     posts = Post.objects.all().order_by('id')
-    return render(request,
-                  'board_app/post_list.html',  # 呼び出す Template
-                  {'posts': posts})  # Template に渡すデータ
-
+    return render(request, 'board_app/post_list.html', {'posts': posts})
 
 def edit_post(request, post_id):
-    """
-    対象のデータを編集する
-    """
-    # IDを引数に、対象オブジェクトを取得
     post = get_object_or_404(Post, pk=post_id)
 
-    # ページロード時
     if request.method == 'GET':
-        # 対象オブジェクトにより form を作成
         form = PostForm(instance=post)
+        return render(request, 'board_app/post_form.html', {'form': form, 'post_id': post_id})
 
-        # ページロード時は form とデータIDを Template に渡す
-        return render(request,
-                      'board_app/post_form.html',  # 呼び出す Template
-                      {'form': form, 'post_id': post_id})  # Template に渡すデータ
-
-    # 実行ボタン押下時
     elif request.method == 'POST':
-        # POST されたデータにより form を作成
         form = PostForm(request.POST, instance=post)
-
-        # 入力されたデータのバリデーション
         if form.is_valid():
-            # チェック結果に問題なければデータを更新する
             post = form.save(commit=False)
             post.save()
 
-        # 実行ボタン押下時は処理実行後、一覧画面にリダイレクトする
-        return redirect('board_app:read_post')
-
+        return redirect('board_app:thread_detail', thread_id=post.thread.id)  # 編集後にスレッド詳細ページにリダイレクト
 
 def delete_post(request, post_id):
-    # 対象のオブジェクトを取得
     post = get_object_or_404(Post, pk=post_id)
+    thread_id = post.thread.id
     post.delete()
-
-    # 削除リクエスト時は削除実行後、一覧表示画面へリダイレクトする
-    return redirect('board_app:read_post')
-
+    return redirect('board_app:thread_detail', thread_id=thread_id)  # 削除後にスレッド詳細ページにリダイレクト
 
 def thread_list(request):
-    threads = Thread.objects.all()  # スレッドを全て取得
+    threads = Thread.objects.all()
     return render(request, 'board_app/thread_list.html', {'threads': threads})
 
+@login_required  # 投稿はログインユーザーのみ可能
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)
-    posts = thread.posts.all()  # スレッドに紐づくすべての投稿を取得
+    posts = thread.posts.all()
+
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
-            post.thread = thread  # この投稿がどのスレッドに属するかを設定
-            post.author = request.user  # 現在のユーザーを投稿者に設定（ログインしている場合）
+            post.thread = thread
+            post.author = request.user  # 現在のユーザーを設定
             post.save()
             return redirect('board_app:thread_detail', thread_id=thread.id)
     else:
@@ -129,12 +88,25 @@ def thread_detail(request, thread_id):
         'form': form,
     })
 
+@login_required  # ログインしていない場合、ログインページにリダイレクト
 def create_thread(request):
     if request.method == 'POST':
         form = ThreadForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('board_app:thread_list')  # 名前空間を含めたURLにリダイレクト
+            return redirect('board_app:thread_list')  # スレッド一覧ページにリダイレクト
     else:
         form = ThreadForm()
     return render(request, 'board_app/thread_form.html', {'form': form})
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '新しいユーザーが作成されました！')
+            return redirect('login')  # 登録後にログインページにリダイレクト
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, 'registration/register.html', {'form': form})

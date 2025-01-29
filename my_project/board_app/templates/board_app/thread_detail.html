@@ -1,16 +1,12 @@
-<!-- thread_detail.html -->
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ thread.title }}</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}{{ thread.title }}{% endblock %}
+
+{% block content %}
     <h1>{{ thread.title }}</h1>
     <p>{{ thread.content }}</p>
 
-    <h2>投稿</h2>
+    <h2>リプライする</h2>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
@@ -30,5 +26,4 @@
     </ul>
 
     <a href="{% url 'board_app:thread_list' %}">スレッド一覧に戻る</a>
-</body>
-</html>
+{% endblock %}

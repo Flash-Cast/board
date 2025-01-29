@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
 from pathlib import Path
 import os
 
@@ -127,6 +126,9 @@ MEDIA_URL = '/media/'
 # メディアファイルを保存するディレクトリのパス設定
 MEDIA_ROOT = BASE_DIR / 'media'
 
+LOGIN_REDIRECT_URL = 'board_app:thread_list'  # ログイン後のリダイレクト先
+LOGOUT_REDIRECT_URL = '/login/'  # ログアウト後のリダイレクト先
+LOGIN_URL = '/login/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

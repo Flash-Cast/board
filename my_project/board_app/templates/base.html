@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Site{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'board_app:thread_list' %}">スレッド一覧</a></li>
+                <li><a href="{% url 'board_app:create_thread' %}">スレッド作成</a></li>
+                
+                <!-- ログアウトフォーム -->
+                <li>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">ログアウト</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 My Site</p>
+    </footer>
+</body>
+</html>

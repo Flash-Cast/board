@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>スレッド作成</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}新しいスレッドを作成{% endblock %}
+
+{% block content %}
     <h1>新しいスレッドを作成</h1>
     
     <!-- フォーム表示 -->
@@ -22,7 +20,4 @@
     </form>
 
     <a href="{% url 'board_app:thread_list' %}">スレッド一覧に戻る</a>
-
-
-</body>
-</html>
+{% endblock %}
