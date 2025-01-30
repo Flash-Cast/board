@@ -12,5 +12,10 @@
         <button type="submit">送信</button>
     </form>
 
-    <a href="{% url 'board_app:thread_detail' thread_id=thread.id %}">戻る</a>
+    {% if post.thread %}
+        <a href="{% url 'board_app:thread_detail' thread_id=post.thread.id %}">戻る</a>
+    {% else %}
+        <p>関連するスレッドが見つかりません。</p>
+    {% endif %}
+
 {% endblock %}

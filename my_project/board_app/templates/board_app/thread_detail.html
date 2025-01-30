@@ -17,7 +17,12 @@
     <ul>
         {% for post in posts %}
             <li>
-                <strong>{{ post.author.username }}</strong> ({{ post.created_at }})
+                <strong>
+                    {{ post.author.username }}
+                    {% if post.is_admin %}
+                        <span style="color: red; font-weight: bold;">(管理者)</span>
+                    {% endif %}
+                </strong> ({{ post.created_at }})
                 <p>{{ post.content }}</p>
 
                 <!-- 通報フォーム: post.idが存在する場合に表示 -->

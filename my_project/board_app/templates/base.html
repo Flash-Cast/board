@@ -21,11 +21,18 @@
                 {% endif %}
                 <!-- ログアウトフォーム -->
                 <li>
-                    <form method="POST" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit">ログアウト</button>
-                    </form>
+                    {% if request.user.is_authenticated %}
+                        <form method="POST" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit">ログアウト</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}">
+                            <button type="button">ログイン</button>
+                        </a>
+                    {% endif %}
                 </li>
+                
                 {% if user.is_superuser or user.groups.all|length > 0 %}
                     <li><a href="{% url 'board_app:admin_dashboard' %}">管理者専用画面</a></li>
                 {% endif %}

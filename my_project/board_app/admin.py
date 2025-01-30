@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Thread, Post
+from .models import Thread, Post, Report
 
 # スレッド管理
 class ThreadAdmin(admin.ModelAdmin):
@@ -14,4 +14,8 @@ class PostAdmin(admin.ModelAdmin):
 # 管理画面に登録
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Post, PostAdmin)
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('reported_post', 'reported_by', 'created_at')  # 管理画面の表示項目
 

@@ -32,7 +32,9 @@ def thread_list(request):
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)
     posts = thread.posts.all()
-
+    for post in posts:
+        post.is_admin = post.author.is_superuser or post.author.groups.filter(name="管理者").exists()
+        
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
@@ -86,10 +88,11 @@ def ban_user(request, user_id):
 @login_required
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    thread = post.thread if post.thread else None
-    if not thread:
+    if not post.thread:
         messages.error(request, '関連するスレッドが見つかりません。')
-        return redirect('board_app:thread_list')  # スレッド一覧などにリダイレクト
+        return redirect('board_app:thread_list')  # スレッド一覧にリダイレクト
+
+    thread = post.thread  # threadがNoneでないことを保証
     if request.method == 'POST':
         form = ReportForm(request.POST)
         if form.is_valid():
@@ -100,7 +103,7 @@ def report_post(request, post_id):
             return redirect('board_app:thread_list')
     else:
         form = ReportForm()
-    return render(request, 'board_app/report_post.html', {'form': form})
+    return render(request, 'board_app/report_post.html', {'form': form,'post':post})
 
 @login_required
 def profile_edit(request):
