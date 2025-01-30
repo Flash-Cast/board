@@ -20,7 +20,7 @@
                     <li><a href="{% url 'board_app:profile' %}">プロフィール</a></li>
                 {% endif %}
                 <!-- ログアウトフォーム -->
-                <li>
+                <li class="login-logout">
                     {% if request.user.is_authenticated %}
                         <form method="POST" action="{% url 'logout' %}">
                             {% csrf_token %}
@@ -45,7 +45,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 tsukui</p>
+        <p>&copy; 2025 RyutaTsukui All Rights Reserved</p>
     </footer>
 </body>
 </html>

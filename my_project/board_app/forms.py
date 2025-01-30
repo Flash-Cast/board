@@ -23,6 +23,14 @@ class UserRegistrationForm(UserCreationForm):
     password = forms.CharField(widget=forms.PasswordInput)
     password_confirm = forms.CharField(widget=forms.PasswordInput, label="パスワード確認")
 
+class UserRegistrationForm(UserCreationForm):
+    terms_agreement = forms.BooleanField(
+        required=True,
+        label="利用規約に同意する",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        error_messages={'required': '利用規約に同意する必要があります。'}
+    )
+
     class Meta:
         model = User
         fields = ['username', 'email','password1','password2']

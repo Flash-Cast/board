@@ -11,6 +11,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .forms import ReportForm
 from .forms import ProfileEditForm
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
 
 # PostFormクラスをビュー関数の前に定義
 class PostForm(ModelForm):
@@ -34,7 +36,7 @@ def thread_detail(request, thread_id):
     posts = thread.posts.all()
     for post in posts:
         post.is_admin = post.author.is_superuser or post.author.groups.filter(name="管理者").exists()
-        
+
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
@@ -70,6 +72,8 @@ def register(request):
             form.save()
             messages.success(request, '新しいユーザーが作成されました！')
             return redirect('login')  # 登録後にログインページにリダイレクト
+        else:
+            messages.error(request, '利用規約に同意する必要があります。')  # 同意していない場合のエラーメッセージ
     else:
         form = UserRegistrationForm()
 
@@ -77,6 +81,9 @@ def register(request):
 
 def about(request):
     return render(request, 'board_app/about.html')
+
+def terms_of_service(request):
+    return render(request, 'registration/terms_of_service.html')
 
 @staff_member_required  # 管理者だけが実行可能
 def ban_user(request, user_id):

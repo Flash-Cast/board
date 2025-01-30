@@ -26,6 +26,10 @@ header nav ul li {
     text-align: left;
 }
 
+header nav ul li.login-logout {
+    margin-left: auto;  /* 左側の空きスペースを埋めて右寄せ */
+}
+
 header nav ul li a {
     color: #fff;
     text-decoration: none;
@@ -41,20 +45,30 @@ header nav form {
     display: inline-block;
 }
 
-/* メインコンテンツ */
-main {
-    padding: 20px;
+
+html, body {
+    height: 100%;  /* ページ全体が100%の高さを持つように */
+    margin: 0;
+    padding: 0;
 }
 
-/* フッター */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;  /* ページ全体の高さを確保 */
+}
+
+main {
+    flex-grow: 1;  /* コンテンツが空きスペースを埋めるようにする */
+    padding: 30px;
+}
+
 footer {
     background-color: #333;
     color: #fff;
     text-align: center;
     padding: 10px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    margin-top: 20px;  /* コンテンツとフッターの間に少し余白を追加 */
 }
 
 /* ボタン */

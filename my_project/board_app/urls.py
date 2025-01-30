@@ -8,6 +8,7 @@ from .views import admin_dashboard
 print("board_app URLs loaded")
 
 app_name = 'board_app'  # 名前空間の設定
+app_name = 'registration'
 
 urlpatterns = [  
     path('create/', views.create_thread, name='create_thread'),  # スレッド作成
@@ -23,4 +24,5 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),  # プロフィールページ
     path('profile/edit/', views.profile_edit, name='profile_edit'), 
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),  # 管理者専用画面
+    path('terms/', views.terms_of_service, name='terms_of_service'),
 ]
