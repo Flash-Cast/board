@@ -7,36 +7,49 @@
     <p>{{ thread.content }}</p>
 
     <h2>コメント作成</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data" class="comment-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">コメントする</button>
+        <label for="content">コメント内容</label>
+        {{ form.content }}
+
+        <label for="file">添付ファイル</label>
+        {{ form.file }}
+
+        <button type="submit" class="btn btn-primary">コメントする</button>
     </form>
 
     <h2>コメント一覧</h2>
-    <ul>
+    <div class="comment-list">
         {% for post in posts %}
-            <li>
-                <strong>
-                    {{ post.author.username }}
-                    {% if post.is_admin %}
-                        <span style="color: red; font-weight: bold;">(管理者)</span>
-                    {% endif %}
-                </strong> ({{ post.created_at }})
+            <div class="comment">
+                <strong>{{ post.author.username }}</strong> ({{ post.created_at|date:"Y-m-d H:i" }})
+                {% if post.is_admin %}
+                    <span class="admin-badge">(管理者)</span>
+                {% endif %}
                 <p>{{ post.content }}</p>
 
-                <!-- 通報フォーム: post.idが存在する場合に表示 -->
-                {% if post.id %}
-                    <form method="POST" action="{% url 'board_app:report_post' post.id %}">
-                        {% csrf_token %}
-                        <button type="submit">通報</button>
-                    </form>
+                {% if post.file %}
+                    <p>添付ファイル: <a href="{{ post.file.url }}" target="_blank">{{ post.file.name }}</a></p>
                 {% endif %}
-            </li>
-        {% empty %}
-            <li>コメントはありません。</li>
-        {% endfor %}
-    </ul>
 
-    <a href="{% url 'board_app:thread_list' %}">スレッド一覧に戻る</a>
+                <div class="comment-actions">
+                    {% if post.author == request.user %}
+                        <form method="POST" action="{% url 'board_app:post_delete' post.id %}" class="delete-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('本当に削除しますか？');">削除</button>
+                        </form>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'board_app:report_post' post.id %}" class="report-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning">通報</button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <p>コメントはありません。</p>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'board_app:thread_list' %}" class="btn btn-secondary">スレッド一覧に戻る</a>
 {% endblock %}

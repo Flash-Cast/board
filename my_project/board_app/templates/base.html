@@ -4,22 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}生体の溜まり場{% endblock %}</title>
+    <title>{% block title %}{{ block.super }} - 生体の箱庭{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header>
-        <h1>生体の溜まり場</h1>
+        <h1>生体の箱庭</h1>
         <nav>
             <ul>
+                <li class="notice-container">
+                    <button id="notice-button">お知らせ <span id="notice-count" class="badge">0</span></button>
+                    <ul id="notice-dropdown" class="dropdown">
+                        {% for notice in notices %}
+                        <li class="notice-item {% if notice.is_read %}read{% else %}unread{% endif %}" data-content="{{ notice.content }}">
+                            {{ notice.title }}
+                        </li>                        
+                        {% empty %}
+                            <li class="no-notice">お知らせはありません</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                
+                <!-- お知らせ詳細表示用のモーダル -->
+                <div id="notice-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p id="notice-text"></p>
+                    </div>
+                </div>
                 <li><a href="{% url 'board_app:thread_list' %}">スレッド一覧</a></li>
                 <li><a href="{% url 'board_app:create_thread' %}">スレッド作成</a></li>
                 <li><a href="{% url 'board_app:about' %}">サイトについて</a></li>
                 {% if user.is_authenticated %}
-                    <!-- ログインしているユーザーにプロフィールリンクを表示 -->
                     <li><a href="{% url 'board_app:profile' %}">プロフィール</a></li>
                 {% endif %}
-                <!-- ログアウトフォーム -->
                 <li class="login-logout">
                     {% if request.user.is_authenticated %}
                         <form method="POST" action="{% url 'logout' %}">
@@ -27,12 +45,9 @@
                             <button type="submit">ログアウト</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}">
-                            <button type="button">ログイン</button>
-                        </a>
+                        <a href="{% url 'login' %}"><button type="button">ログイン</button></a>
                     {% endif %}
                 </li>
-                
                 {% if user.is_superuser or user.groups.all|length > 0 %}
                     <li><a href="{% url 'board_app:admin_dashboard' %}">管理者専用画面</a></li>
                 {% endif %}
@@ -45,7 +60,108 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 RyutaTsukui All Rights Reserved</p>
+        <p>ver.1.2.1 &copy; 2025 All Rights Reserved</p>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var noticeButton = document.getElementById("notice-button");
+            var dropdown = document.getElementById("notice-dropdown");
+            var noticeItems = document.querySelectorAll(".notice-item");
+            var noticeCount = document.getElementById("notice-count");
+            var unreadNotices = document.querySelectorAll(".notice-item.unread");
+            var modal = document.getElementById("notice-modal");
+            var modalText = document.getElementById("notice-text");
+            var closeModal = document.querySelector(".close");
+        
+            // 未読件数の表示
+            if (unreadNotices.length > 0) {
+                noticeCount.textContent = unreadNotices.length;
+                noticeCount.style.display = "inline-block";
+            }
+        
+            // お知らせドロップダウンの開閉（フェードイン/アウト）
+            noticeButton.addEventListener("click", function(event) {
+                if (dropdown.style.opacity === "1") {
+                    dropdown.style.opacity = "0";
+                    setTimeout(() => { dropdown.style.display = "none"; }, 300);
+                } else {
+                    dropdown.style.display = "block";
+                    setTimeout(() => { dropdown.style.opacity = "1"; }, 10);
+                }
+                event.stopPropagation();
+            });
+        
+            document.addEventListener("click", function() {
+                dropdown.style.opacity = "0";
+                setTimeout(() => { dropdown.style.display = "none"; }, 300);
+            });
+        
+            dropdown.addEventListener("click", function(event) {
+                event.stopPropagation();
+            });
+        
+            // お知らせクリックで詳細表示＆既読処理
+            noticeItems.forEach(item => {
+                item.addEventListener("click", function() {
+                    modalText.textContent = this.getAttribute("data-content");
+                    modal.style.display = "flex";
+        
+                    // 既読処理
+                    if (this.classList.contains("unread")) {
+                        this.classList.remove("unread");
+                        this.classList.add("read");
+        
+                        // サーバーに既読リクエストを送信（Django APIに変更してください）
+                        var noticeId = this.getAttribute("data-id");
+                        fetch(`/mark_as_read/${noticeId}/`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": getCsrfToken() // Django用CSRFトークン取得
+                            },
+                            body: JSON.stringify({ read: true })
+                        }).then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log("既読処理完了");
+                                updateUnreadCount();
+                            }
+                        }).catch(error => console.error("エラー:", error));
+                    }
+                });
+            });
+        
+            // モーダルを閉じる（フェードアウト）
+            closeModal.addEventListener("click", function() {
+                modal.style.opacity = "0";
+                setTimeout(() => { modal.style.display = "none"; }, 300);
+            });
+        
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.opacity = "0";
+                    setTimeout(() => { modal.style.display = "none"; }, 300);
+                }
+            });
+        
+            // 未読件数を更新
+            function updateUnreadCount() {
+                var unreadCount = document.querySelectorAll(".notice-item.unread").length;
+                if (unreadCount > 0) {
+                    noticeCount.textContent = unreadCount;
+                    noticeCount.style.display = "inline-block";
+                } else {
+                    noticeCount.style.display = "none";
+                }
+            }
+        
+            // CSRFトークン取得関数（Django用）
+            function getCsrfToken() {
+                return document.querySelector("[name=csrfmiddlewaretoken]").value;
+            }
+        });        
+        
+    </script>
 </body>
 </html>

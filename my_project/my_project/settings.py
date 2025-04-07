@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-pi600u()#@z3qiora6g55mtda@vhtd#b6g3-vzg64v8%w!d-!z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','seitai-board.com','www.seitai-board.com']
 
 
 # Application definition
@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'board_app.apps.BoardAppConfig',
 ]
+
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -118,17 +121,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # プロジェクト内の 'static' フォルダを指定
+    os.path.join(BASE_DIR, 'static'), 
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+
 
 # メディアファイルのURL設定
 MEDIA_URL = '/media/'
 
 # メディアファイルを保存するディレクトリのパス設定
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = 'board_app:thread_list'  # ログイン後のリダイレクト先
 LOGOUT_REDIRECT_URL = '/login/'  # ログアウト後のリダイレクト先
@@ -138,3 +146,4 @@ LOGIN_URL = '/login/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

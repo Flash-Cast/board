@@ -4,12 +4,49 @@
 
 {% block content %}
     <h1>スレッド一覧</h1>
-    <a href="{% url 'board_app:create_thread' %}">新しいスレッドを作成</a>
-    <ul>
-        {% for thread in threads %}
-            <li><a href="{% url 'board_app:thread_detail' thread.id %}">{{ thread.title }}</a> - 作成日: {{ thread.created_at }}</li>
-        {% empty %}
-            <li>スレッドはありません。</li>
-        {% endfor %}
-    </ul>
+    
+    <a href="{% url 'board_app:create_thread' %}" class="btn btn-primary">新しいスレッドを作成</a>
+
+    <!-- カテゴリ選択フォーム -->
+    <form method="get" class="category-form">
+        <label for="category">カテゴリ選択：</label>
+        <select name="category" id="category" onchange="this.form.submit()">
+            <option value="">すべて</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category and selected_category.id == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <!-- 選択したカテゴリ名を表示 -->
+    {% if selected_category %}
+        <h2>カテゴリ: {{ selected_category.name }}</h2>
+    {% else %}
+        <h2>すべてのスレッド</h2>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>タイトル</th>
+                <th>作成日</th>
+                <th>投稿数</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for thread in threads %}
+                <tr>
+                    <td><a href="{% url 'board_app:thread_detail' thread.id %}">{{ thread.title }}</a></td>
+                    <td>{{ thread.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ thread.posts.count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">スレッドはありません。</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

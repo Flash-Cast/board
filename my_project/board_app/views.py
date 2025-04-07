@@ -2,9 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from board_app.models import Post, Thread, Report
+from board_app.models import Post, Thread, Report, Notice, Category
 from .forms import PostForm
-from .thread_form import ThreadForm
+from .forms import ThreadForm
 from .forms import UserRegistrationForm
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
@@ -28,17 +28,27 @@ class PostForm(ModelForm):
 @login_required
 def thread_list(request):
     threads = Thread.objects.all()
-    return render(request, 'board_app/thread_list.html', {'threads': threads})
+    category_id = request.GET.get('category')
+    selected_category = None
+    notices = Notice.objects.all().order_by('-created_at')[:5]  # 最新5件のお知らせを取得
+    if category_id:
+        threads = Thread.objects.filter(category_id=category_id)
+        selected_category = get_object_or_404(Category, id=category_id)
+    else:
+        threads = Thread.objects.all()
+    categories = Category.objects.all()
+    return render(request, 'board_app/thread_list.html', {'threads': threads, 'notices': notices, 'categories': categories,'selected_category': selected_category})
 
 @login_required  # 投稿はログインユーザーのみ可能
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)
+    notices = Notice.objects.all().order_by('-created_at')[:5] 
     posts = thread.posts.all()
     for post in posts:
         post.is_admin = post.author.is_superuser or post.author.groups.filter(name="管理者").exists()
 
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST,request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.thread = thread
@@ -52,12 +62,13 @@ def thread_detail(request, thread_id):
         'thread': thread,
         'posts': posts,
         'form': form,
+        'notices': notices
     })
 
 @login_required  # ログインしていない場合、ログインページにリダイレクト
 def create_thread(request):
     if request.method == 'POST':
-        form = ThreadForm(request.POST)
+        form = ThreadForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('board_app:thread_list')  # スレッド一覧ページにリダイレクト
@@ -69,15 +80,18 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            login(request, user)  # 新規登録後に自動ログイン
             messages.success(request, '新しいユーザーが作成されました！')
-            return redirect('login')  # 登録後にログインページにリダイレクト
+            return redirect('board_app:thread_list')  # スレッド一覧ページにリダイレクト
         else:
-            messages.error(request, '利用規約に同意する必要があります。')  # 同意していない場合のエラーメッセージ
+            messages.error(request, '入力内容に誤りがあります。')
+
     else:
         form = UserRegistrationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+
 
 def about(request):
     return render(request, 'board_app/about.html')
@@ -123,7 +137,7 @@ def profile_edit(request):
         if form.is_valid():
             form.save()  # ユーザー情報を保存
             messages.success(request, 'プロフィールが更新されました。')
-            return redirect('profile')  # 編集後にプロフィールページにリダイレクト
+            return redirect('board_app:profile')  # 編集後にプロフィールページにリダイレクト
     else:
         # ユーザーの現在の情報でフォームを表示
         form = ProfileEditForm(instance=user)
@@ -142,3 +156,16 @@ def admin_required(user):
 @user_passes_test(admin_required)
 def admin_dashboard(request):
     return render(request, 'board_app/admin_dashboard.html')
+
+@login_required
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # 投稿者のみ削除可能
+    if request.user == post.author:
+        post.delete()
+        messages.success(request, "投稿を削除しました。")
+    else:
+        messages.error(request, "この投稿を削除する権限がありません。")
+
+    return redirect('board_app:thread_list')  # 削除後のリダイレクト先を設定
