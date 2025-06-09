@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}新規登録{% endblock %}
+
+{% block content %}
+    <h1>新規登録</h1>
+
+    <form method="POST" action="{% url 'board_app:register' %}" class="form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_username">ユーザー名:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <span class="error-text">{{ form.username.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_email">メールアドレス:</label>
+            {{ form.email }}
+            <small class="text-muted">※大学ドメインのみ利用可能</small>
+            {% if form.email.errors %}
+                <span class="error-text">{{ form.email.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_password1">パスワード:</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <span class="error-text">{{ form.password1.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_password2">パスワード（確認用）:</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <span class="error-text">{{ form.password2.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="error-text">
+                <ul>
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- 利用規約 -->
+        <div class="terms">
+            <h3>利用規約</h3>
+            <p>
+                新規登録をすることで、<a href="{% url 'board_app:terms_of_service' %}" target="_blank">こちらの利用規約</a>に同意したことになります。
+            </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">登録</button>
+    </form>
+    <a href="{% url 'board_app:password_reset' %}">パスワードを忘れた場合</a><br>
+
+    <a href="{% url 'board_app:login' %}">ログインページへ戻る</a>
+{% endblock %}

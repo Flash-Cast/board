@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from board_app.models import Post, Thread, Report, Notice, Category
+from board_app.models import Post, Thread, Report, Notice, Category, UserNoticeStatus ,Todo
 from .forms import PostForm
 from .forms import ThreadForm
 from .forms import UserRegistrationForm
+from .forms import TodoForm 
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import ReportForm
@@ -13,6 +14,10 @@ from .forms import ProfileEditForm
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.utils import timezone
+from datetime import timedelta
 
 # PostFormクラスをビュー関数の前に定義
 class PostForm(ModelForm):
@@ -90,14 +95,14 @@ def register(request):
     else:
         form = UserRegistrationForm()
 
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'board_app/register.html', {'form': form})
 
 
 def about(request):
     return render(request, 'board_app/about.html')
 
 def terms_of_service(request):
-    return render(request, 'registration/terms_of_service.html')
+    return render(request, 'board_app/terms_of_service.html')
 
 @staff_member_required  # 管理者だけが実行可能
 def ban_user(request, user_id):
@@ -169,3 +174,72 @@ def post_delete(request, post_id):
         messages.error(request, "この投稿を削除する権限がありません。")
 
     return redirect('board_app:thread_list')  # 削除後のリダイレクト先を設定
+
+
+@login_required
+@require_POST
+def mark_as_read(request, notice_id):
+    """お知らせを既読としてマークするAPIビュー"""
+    try:
+        # ログイン中のユーザーと、URLから受け取ったnotice_idを使って、
+        # 既読状態(UserNoticeStatus)を更新または新規作成します。
+        # レコードがあれば更新、なければ作成してくれる便利なメソッドです。
+        UserNoticeStatus.objects.update_or_create(
+            user=request.user,
+            notice_id=notice_id,
+            defaults={'is_read': True} # 既読(True)に設定
+        )
+
+        # 処理が成功したことをJavaScriptに伝える
+        return JsonResponse({'success': True})
+
+    except Exception as e:
+        # 何かエラーが起きた場合
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+@login_required
+def home(request):
+    """ホーム画面"""
+    # --- POSTリクエスト（フォームが送信された時）の処理 ---
+    if request.method == 'POST':
+        form = TodoForm(request.POST)
+        if form.is_valid():
+            form.save() # データをデータベースに保存
+            return redirect('board_app:home') # ホーム画面にリダイレクト
+    # --- GETリクエスト（ページが普通に表示された時）の処理 ---
+    else:
+        form = TodoForm() # 空のフォームを準備
+
+    # --- 表示データの取得（ここは変更なし） ---
+    latest_notices = Notice.objects.order_by('-created_at')[:5]
+    today = timezone.localdate()
+    three_days_ago = today - timedelta(days=3)
+    three_days_later = today + timedelta(days=3)
+    todo_list = Todo.objects.filter(due_date__gt=three_days_ago)
+    
+    # ↓ここから絞り込みのロジック↓
+    # まずは期限切れでないTodoをすべて取得する準備
+    base_query = Todo.objects.filter(due_date__gt=three_days_ago)
+
+    # URLから'grade'の値を取得する (例: '1', '2'など)
+    selected_grade = request.GET.get('grade') 
+
+    if selected_grade:
+        # もし'grade'の値があれば、それでさらにデータを絞り込む
+        todo_list = base_query.filter(grade=selected_grade)
+    else:
+        # 'grade'の値がなければ（「全学年」クリック時など）、すべてのデータを表示
+        todo_list = base_query
+    # ↑ここまでが絞り込みのロジック↑
+
+    for todo in todo_list:
+        todo.is_overdue = todo.due_date < today
+        todo.is_warning = today <= todo.due_date <= three_days_later
+
+    context = {
+        'latest_notices': latest_notices,
+        'todo_list': todo_list,
+        'form': form,
+        'selected_grade': selected_grade, # contextにフォームを追加
+    }
+    return render(request, 'board_app/home.html', context)

@@ -1,18 +1,22 @@
+# このファイル（プロジェクトのurls.py）を以下のように修正してください
+
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib.auth import views as auth_views
-from board_app import views
+# from board_app import views  <-- board_appのビューは直接使わないので、この行は削除してもOKです
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('board_app/', include('board_app.urls', namespace='board_app')),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('accounts/', include('django.contrib.auth.urls')),  # これにより、ログイン、ログアウトなどのURLが登録されます
-    path('register/', views.register, name='register'),
-    path('', views.thread_list, name='thread_list'),
-    path('thread/', views.thread_list, name='thread_list'),
-     path('terms_of_service/', views.terms_of_service, name='terms_of_service')
+    
+    # login, logoutなどの認証関連はここに残します
+    path('accounts/', include('django.contrib.auth.urls')),
+    
+    # ↓ board_appに関するURLは、この一行に集約します
+    # プレフィックスを'board_app/'から''に変更し、全てのアクセスをboard_app.urlsに任せます
+    path('', include('board_app.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# 注：元のファイルにあった'register/', 'terms_of_service/'などは、
+# 次のステップでboard_app/urls.pyに移動させるので、このファイルからは削除されています。

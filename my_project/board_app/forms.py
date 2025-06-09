@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Thread, Report
+from .models import Post, Thread, Report, Todo
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
@@ -67,3 +67,12 @@ class ThreadForm(forms.ModelForm):
     class Meta:
         model = Thread
         fields = ['title', 'content', 'file', 'category']
+
+
+class TodoForm(forms.ModelForm):
+    class Meta:
+        model = Todo
+        fields = ['title', 'due_date', 'grade']
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
+        }

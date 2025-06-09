@@ -7,14 +7,15 @@ print("board_app URLs loaded")  # デバッグ用（デプロイ時は削除）
 app_name = 'board_app'  # 名前空間の設定（タプルにしない）
 
 urlpatterns = [  
-    path('', views.thread_list, name='thread_list'),  # スレッド一覧（トップページ）
+    path('', views.home, name="home"),
+    path('thread_list/', views.thread_list, name='thread_list'),  # スレッド一覧（トップページ）
     path('create/', views.create_thread, name='create_thread'),  # スレッド作成
     path('thread/<int:thread_id>/', views.thread_detail, name='thread_detail'),  # スレッド詳細
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('login/', auth_views.LoginView.as_view(template_name='board_app/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
     path('about/', views.about, name='about'),
-    path('terms/', views.terms_of_service, name='terms_of_service'),  # 利用規約
+    path('terms_of_service/', views.terms_of_service, name='terms_of_service'),  # 利用規約
     
     # プロフィール関連
     path('profile/', views.profile, name='profile'),  
@@ -29,4 +30,6 @@ urlpatterns = [
 
     # 通報機能
     path('report/<int:post_id>/', views.report_post, name='report_post'),
+    # お知らせ機能
+    path('mark_as_read/<int:notice_id>/', views.mark_as_read, name='mark_as_read'),
 ]

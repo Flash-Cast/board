@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}ホーム - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 20px;">
+    <h2>ホーム</h2>
+
+    {% if user.is_authenticated %}
+        <p>ようこそ、{{ user.username }}さん！</p>
+    {% else %}
+        <p>ようこそ！ログインすると、全ての機能が利用できます。</p>
+    {% endif %}
+
+    <hr>
+
+    <div class="home-section" style="border: 1px solid #eee; padding: 15px; border-radius: 8px;">
+        <h3>📝 課題リスト</h3>
+        <div class="filter-nav" style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+            <form method="get" class="grade-form" action="{% url 'board_app:home' %}">
+                <label for="grade-filter" style="font-weight: bold; margin-right: 5px;">学年で絞り込み:</label>
+                <select name="grade" id="grade-filter" onchange="this.form.submit()">
+                    <option value="">全学年</option>
+                    <option value="1" {% if selected_grade == '1' %}selected{% endif %}>1年</option>
+                    <option value="2" {% if selected_grade == '2' %}selected{% endif %}>2年</option>
+                    <option value="3" {% if selected_grade == '3' %}selected{% endif %}>3年</option>
+                    <option value="4" {% if selected_grade == '4' %}selected{% endif %}>4年</option>
+                </select>
+            </form>
+        </div>
+
+        <table class="todo-table" ... >
+        <table class="todo-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #333;">
+                    <th style="padding: 8px; text-align: left;">タスク名</th>
+                    <th style="padding: 8px; text-align: left;">締切日</th>
+                    <th style="padding: 8px; text-align: left;">学年</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for todo in todo_list %}
+                    {# ビューで付けたフラグに応じて、trタグにクラスを適用 #}
+                    <tr 
+                        {% if todo.is_overdue %} class="overdue" 
+                        {% elif todo.is_warning %} class="warning" 
+                        {% endif %}
+                        style="border-bottom: 1px solid #eee;"
+                    >
+                        <td style="padding: 8px;">{{ todo.title }}</td>
+                        <td style="padding: 8px;">{{ todo.due_date|date:"Y/m/d" }}</td>
+                        <td style="padding: 8px;">{{ todo.get_grade_display }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" style="padding: 8px; text-align: center;">現在、タスクはありません。</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="home-section" style="border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <h3>新しいTodoを追加</h3>
+        <form method="post" action="{% url 'board_app:home' %}">
+            {% csrf_token %}
+            <div style="display: grid; gap: 10px;">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" style="margin-top: 10px;">追加する</button>
+        </form>
+    </div>
+    <hr>
+
+    {# 簡単なスタイルを<style>タグで定義。後でcssファイルに移すのがおすすめです #}
+    <style>
+        .todo-table .overdue {
+            color: #999; /* 締切を過ぎたら色を薄くする */
+            text-decoration: line-through;
+        }
+        .todo-table .warning {
+            font-weight: bold; /* 締切間近で強調する */
+            color: #d9534f;
+        }
+    </style>
+
+        <div class="home-section" style="border: 1px solid #eee; padding: 15px; border-radius: 8px;">
+            <h3><a href="#">📢 最新のお知らせ</a></h3>
+            {% if latest_notices %}
+                <ul style="padding-left: 20px; list-style: disc;">
+                    {% for notice in latest_notices %}
+                        <li>
+                             <a href="#">{{ notice.title }}</a> 
+                            <small>({{ notice.created_at|date:"Y/m/d" }})</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>新しいお知らせはありません。</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

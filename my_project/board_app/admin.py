@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Thread, Post, Report, Notice, Category
+from .models import Thread, Post, Report, Notice, Category, Todo, UserNoticeStatus
 
 # スレッド管理
 class ThreadAdmin(admin.ModelAdmin):
@@ -35,8 +35,18 @@ class ReportAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     readonly_fields = ('created_at',)
 
+@admin.register(Todo)
+class TodoAdmin(admin.ModelAdmin):
+    # 一覧ページに表示する項目を指定
+    list_display = ('title', 'due_date', 'grade')
+    # 管理画面の右側に出てくる絞り込み（フィルタ）項目を指定
+    list_filter = ('grade', 'due_date')
+    # 検索ボックスで検索できる項目を指定
+    search_fields = ('title',)
+
 # 管理画面に登録
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Notice, NoticeAdmin)
 admin.site.register(Category)
+admin.site.register(UserNoticeStatus)

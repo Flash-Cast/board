@@ -296,3 +296,405 @@ footer {
     font-size: 20px;
     cursor: pointer;
 }
+/* 全体のフォントと背景色 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* ヘッダー */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+header nav ul li {
+    margin-right: 20px;
+    text-align: left;
+}
+
+header nav ul li.login-logout {
+    margin-left: auto;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+header nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* ボタン */
+.btn {
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* スレッド一覧テーブル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* コメント一覧 */
+.comment-list {
+    margin-top: 20px;
+}
+
+.comment {
+    background-color: white;
+    border-left: 5px solid #007bff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-actions {
+    margin-top: 5px;
+}
+
+.admin-badge {
+    color: red;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+html, body {
+    height: 100%;  /* ページ全体が100%の高さを持つように */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;  /* ページ全体の高さを確保 */
+}
+
+main {
+    flex-grow: 1;  /* コンテンツが空きスペースを埋めるようにする */
+    padding: 30px;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;  /* コンテンツとフッターの間に少し余白を追加 */
+}
+
+/* カテゴリ選択フォームのデザイン */
+.category-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* ラベルのスタイル */
+.category-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* セレクトボックスのデザイン */
+.category-form select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* ホバー時の効果 */
+.category-form select:hover {
+    border-color: #007bff;
+}
+
+/* セレクトボックスのフォーカス時 */
+.category-form select:focus {
+    border-color: #0056b3;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
+/* お知らせボタン */
+.notice-container {
+    position: relative;
+}
+
+#notice-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+#notice-button:hover {
+    background-color: #0056b3;
+}
+
+/* 未読件数のバッジ */
+.badge {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 12px;
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    display: none;
+}
+
+/* お知らせドロップダウン */
+.dropdown {
+    display: none;
+    position: absolute;
+    left: 0;
+    width: 250px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.notice-item {
+    color: #333;
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    transition: background 0.2s;
+}
+
+.notice-item:hover {
+    background: #f1f1f1;
+}
+
+/* 未読のお知らせ */
+.notice-item.unread {
+    font-weight: bold;
+    color: #d9534f;
+}
+/* 既読のお知らせ */
+.notice-item.read {
+    color: #777; /* 薄いグレー */
+    font-weight: normal;
+}
+
+.notice_content{
+    color: #333;
+}
+
+/* モーダルのデザイン */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 80%;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* カテゴリ選択フォームのデザイン */
+.grade-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* ラベルのスタイル */
+.grade-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* セレクトボックスのデザイン */
+.grade-form select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* ホバー時の効果 */
+.grade-form select:hover {
+    border-color: #007bff;
+}
+
+/* セレクトボックスのフォーカス時 */
+.grade-form select:focus {
+    border-color: #0056b3;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+@media (max-width: 768px) {
+    header nav ul {
+        flex-direction: column; /* 縦並びに変更 */
+        align-items: center;    /* 中央揃えに */
+    }
+
+    header nav ul li {
+        margin-right: 0;      /* 右マージンを削除 */
+        margin-bottom: 10px;  /* 下マージンを追加して間隔を調整 */
+        text-align: center;   /* テキストを中央揃えに */
+    }
+
+    header nav ul li.login-logout {
+        margin-left: 0; /* 左マージンをリセット (必要に応じて調整) */
+    }
+
+    header nav ul li a {
+        font-size: 14px; /* スマートフォンでは少しフォントサイズを大きくするのも良いでしょう */
+    }}
+
+@media (max-width: 768px) {
+    table {
+        display: block; /* テーブルをブロック要素として扱い、overflowを有効にする */
+        overflow-x: auto; /* 横方向のコンテンツがはみ出た場合にスクロールバーを表示 */
+        white-space: nowrap; /* テーブルセル内のテキストが折り返さないようにする */
+    }
+
+    th, td {
+        /* 必要に応じて最小幅を指定したり、パディングを調整 */
+        padding: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px; /* 基本フォントサイズを少し小さくする (または相対単位remを使う) */
+    }
+
+    main {
+        padding: 15px; /* mainコンテンツのパディングを小さくする */
+    }
+
+    .btn {
+        padding: 8px 16px; /* ボタンのパディングを調整 */
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .category-form {
+        flex-direction: column; /* 縦積みに変更 */
+        align-items: stretch;   /* 要素を幅いっぱいに広げる */
+    }
+
+    .category-form label {
+        margin-bottom: 5px; /* ラベルとセレクトボックスの間に余白 */
+    }
+
+    .category-form select {
+        width: 100%; /* セレクトボックスを画面幅いっぱいに */
+    }
+}
