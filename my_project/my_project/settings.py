@@ -1,1 +1,0 @@
-#ここにsetting.py
